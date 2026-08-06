@@ -1,5 +1,5 @@
 import { ApplicationConfig, inject, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, Router, withComponentInputBinding, withNavigationErrorHandler } from '@angular/router';
+import { provideRouter, Router, withComponentInputBinding, withNavigationErrorHandler, withRouterConfig } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
@@ -17,7 +17,8 @@ export const appConfig: ApplicationConfig = {
           }
 
           router.navigate(['/error'])
-        })), 
+        }), 
+       withRouterConfig({paramsInheritanceStrategy: 'always'})), 
        provideHttpClient(), 
        provideStore()]
 };

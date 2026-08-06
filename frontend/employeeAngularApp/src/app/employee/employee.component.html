@@ -1,4 +1,4 @@
-<h1>Employee List</h1>
+<h3>Employee List</h3>
 
 <!-- <ul>
     @for (employee of employees; track employee.id) {
@@ -9,26 +9,26 @@
         </li>
     }
 </ul> -->
-
-<table>
+<div class="table-responsive">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>Name</th>
-            <th>Email</th>
-            <th>Date Of Hire</th>
             <th>Department</th>
             <th>Status</th>
-        </tr>
+            <th>Actions</th>
+       </tr>
     </thead>
     <tbody>
         @for (emp of employees() ; track emp.id) {
             <tr>
                 <td>{{emp.firstName}} {{emp.lastName}}</td>
-                <td>{{emp.email}}</td>
-                <td>{{emp.dateOfHire | date : 'mediumDate'}}</td>
                 <td>{{emp.departmentName}}</td>
                 <td>{{emp.status}}</td>
+                <td><a class="btn btn-link" [routerLink]="'/details/'+emp.id">View Details</a></td>
             </tr>
         }
     </tbody>
 </table>
+</div>
+

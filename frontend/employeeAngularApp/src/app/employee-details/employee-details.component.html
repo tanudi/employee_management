@@ -1,0 +1,36 @@
+
+<div class="details">
+<div class="tabs">
+    <button class="btn" (click)="tab.set('emp')" [class.active]="tab() === 'emp'">Employee</button>
+    <button class="btn" (click)="tab.set('per')" [class.active]="tab() === 'per'">Personal</button>
+    <button class="btn" (click)="tab.set('org')" [class.active]="tab() === 'org'">Organisational</button>
+</div>
+@if (tab() === 'emp') {
+    <div class="tab-content" id="emp">
+
+        <div>
+            Name: {{employee()?.firstName}}  {{employee()?.lastName}}<br>
+            Email: {{employee()?.email}}<br>
+            <br>
+            Level: {{employee()?.role?.level}}<br>
+            Title: {{employee()?.role?.title}}<br>
+            <br>
+            Date Of Hire: {{employee()?.dateOfHire | date: 'mediumDate'}}
+            
+        </div>
+    </div>
+}
+
+@if (tab() === 'per') {
+    <div class="tab-content" id="per">
+        Address: {{employee()?.address?.street}}, {{employee()?.address?.city}}, {{employee()?.address?.country}}
+    </div>
+}
+
+@if (tab() === 'org') {
+    <div class="tab-content" id="org">
+        Department: {{employee()?.departmentName}}<br>
+        
+    </div>
+}
+</div>

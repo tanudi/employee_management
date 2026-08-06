@@ -16,4 +16,8 @@ export class EmployeeService {
   fetchEmployees(): Observable<Employee[]> {
     return this.httpClient.get<Employee[]>(this.url).pipe(catchError(err => of([])))
   }
+
+  fetchEmployeeDetails(empId: string): Observable<Employee | null> {
+    return this.httpClient.get<Employee>(this.url + '/' +empId).pipe(catchError(err => of(null)))
+  }
 }

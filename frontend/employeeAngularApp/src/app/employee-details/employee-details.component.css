@@ -1,0 +1,25 @@
+.tabs {
+    display: flex;
+    border: 0.1em solid;
+    
+    div {
+        padding: 1em;
+        border-right: 0.1em solid;
+    }
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+}
+
+.btn {
+    border: none;
+    outline: none;
+    border-radius: 0;
+}
+
+.btn:hover, .active {
+    background-color: #eee;
+}
