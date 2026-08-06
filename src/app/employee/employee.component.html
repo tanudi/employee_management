@@ -1,0 +1,34 @@
+<h1>Employee List</h1>
+
+<!-- <ul>
+    @for (employee of employees; track employee.id) {
+        <li>
+            <div>
+                {{employee.firstName}} {{employee.lastName}}
+            </div>
+        </li>
+    }
+</ul> -->
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Date Of Hire</th>
+            <th>Department</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (emp of employees() ; track emp.id) {
+            <tr>
+                <td>{{emp.firstName}} {{emp.lastName}}</td>
+                <td>{{emp.email}}</td>
+                <td>{{emp.dateOfHire | date : 'mediumDate'}}</td>
+                <td>{{emp.departmentName}}</td>
+                <td>{{emp.status}}</td>
+            </tr>
+        }
+    </tbody>
+</table>
