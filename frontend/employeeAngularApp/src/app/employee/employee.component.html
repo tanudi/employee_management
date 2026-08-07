@@ -1,28 +1,55 @@
+<div class="container">
+
 <h3>Employee List</h3>
 
-<!-- <ul>
-    @for (employee of employees; track employee.id) {
-        <li>
-            <div>
-                {{employee.firstName}} {{employee.lastName}}
-            </div>
-        </li>
+<div class="filters">
+    <div>
+        <label for="department">Department</label>
+         <select id="department" class="form-control" [formControl]="departmentSelected">
+        <option value="ALL">All</option>
+    @for (dept of departments ; track dept.id) {
+        <option [value]="dept.name">{{dept.name}}</option>
     }
-</ul> -->
+</select>
+    </div>
+     
+    <div>
+        <label for="status">Status</label>
+        <select id="status" class="form-control" [formControl]="statusSelected">
+    <option value="ALL">All</option>
+    <option value="ACTIVE">ACTIVE</option>
+    <option value="INACTIVE">INACTIVE</option>
+</select>
+    </div>
+
+    <div>
+        <label for="sort">Sort by</label>
+        <select id="sort" class="form-control" [formControl]="sortBy">
+            <option value="">Please select</option>
+            @for (emp of sortByList; track emp.value) {
+                <option [value]="emp.value">{{emp.label}}</option>
+            }
+        </select>
+    </div>
+
+</div>
+
 <div class="table-responsive">
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Name</th>
+            <th>Title</th>
             <th>Department</th>
             <th>Status</th>
             <th>Actions</th>
        </tr>
     </thead>
     <tbody>
-        @for (emp of employees() ; track emp.id) {
+        @for (emp of employees() | departmentPipe: departmentSelected.value | statusPipe: statusSelected.value | sortPipe: sortBy.value ?? undefined; track emp.id) {
             <tr>
                 <td>{{emp.firstName}} {{emp.lastName}}</td>
+                <td>{{emp.role.title}}</td>
                 <td>{{emp.departmentName}}</td>
                 <td>{{emp.status}}</td>
                 <td><a class="btn btn-link" [routerLink]="'/details/'+emp.id">View Details</a></td>
@@ -30,5 +57,6 @@
         }
     </tbody>
 </table>
+</div>
 </div>
 

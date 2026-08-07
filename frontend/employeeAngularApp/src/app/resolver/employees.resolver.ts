@@ -1,7 +1,7 @@
 import { ActivatedRouteSnapshot, ResolveFn, RouterStateSnapshot } from "@angular/router";
 import { Employee } from "../employee/employee.model";
 import { inject } from "@angular/core";
-import { EmployeeService } from "../employee/employee.service";
+import { EmployeeService } from "../service/employee.service";
 import {of} from "rxjs";
 
 export const EmployeesResolver: ResolveFn<Employee[]> = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {

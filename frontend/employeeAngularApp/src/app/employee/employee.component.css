@@ -33,3 +33,9 @@ h3 {
     margin-bottom: 1em;;
     margin-left: 1em;;
 }
+
+.filters {
+    display: flex;
+    gap: 2em;
+    justify-content: center;
+}
