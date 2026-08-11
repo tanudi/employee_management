@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EmployeeDetailsComponent } from './employee-details.component';
+import { employeeMockData } from '../employee/employee.component.spec';
 
 describe('EmployeeDetailsComponent', () => {
   let component: EmployeeDetailsComponent;
@@ -14,6 +15,7 @@ describe('EmployeeDetailsComponent', () => {
 
     fixture = TestBed.createComponent(EmployeeDetailsComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('employee', employeeMockData[0])
     fixture.detectChanges();
   });
 
