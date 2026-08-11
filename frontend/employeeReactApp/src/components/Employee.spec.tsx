@@ -1,10 +1,52 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
-import { beforeEach, describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import Employee from "./Employee";
 
-const employeeMockData = [{id: '1', firstName: 'Tanvee', 
-  lastName: 'Anjankar', dateOfHire: '2022-01-03', departmentName: 'Technology', email: 'drama@gmail.com', status: 'ACTIVE'}];
+const employeeMockData = [{id: '1', 
+  firstName: 'Tanvee', 
+  lastName: 'Anjankar', 
+  dateOfHire: '2022-01-03', 
+  departmentName: 'Technology', 
+  email: 'drama@gmail.com', 
+  status: 'ACTIVE', 
+  role: {
+    title: 'Software Engineer',
+    level: 'ABC'
+  },
+  address: {
+    street: 'abc road',
+    city: 'london',
+    country: 'united kingdom'
+  }},
+  {id: '2',
+  firstName: 'John',
+  lastName: 'Doe',
+  dateOfHire: '2021-05-10',
+  departmentName: 'Finance',
+  email: 'john@gmail.com',
+  status: 'INACTIVE',
+  role: {
+    title: 'Accountant',
+    level: 'B2'
+  },
+  address: {
+    street: 'xyz road',
+    city: 'paris',
+    country: 'france'
+  }}];
+
+// vi.hoisted lets the mock data exist before vi.mock (which is hoisted to the top of the file)
+const { departmentMockData } = vi.hoisted(() => ({
+  departmentMockData: [
+    { id: '1', name: 'Technology', location: 'New York' },
+    { id: '2', name: 'Finance', location: 'London' },
+  ],
+}));
+
+vi.mock("../services/DepartmentService", () => ({
+  fetchDepartments: vi.fn(() => Promise.resolve(departmentMockData)),
+}));
 
 describe('Employee Component', () => {
     let router : ReturnType<typeof createMemoryRouter>;
@@ -51,5 +93,49 @@ describe('Employee Component', () => {
         expect(dataFromTable[0]).toContain(expectedDate);
         expect(dataFromTable[0]).toContain(mockData.departmentName);
         expect(dataFromTable[0]).toContain(mockData.email);
+    })
+    test("should filter based on department(Technology) selected", () => {
+        const [departmentComboBox, statusComboBox] = screen.getAllByRole("combobox");
+        fireEvent.change(departmentComboBox, {target: {value: 'Technology'}});
+        const [_, tbody] = screen.getAllByRole("rowgroup");
+        const datRows = within(tbody).getAllByRole("row");
+        const [name, email, dateOfHire, department, status] = within(datRows[0]).getAllByRole("cell");
+        expect(datRows.length).toBe(1);
+        expect(name.textContent).toContain("Tanvee Anjankar");
+        expect(department.textContent).toContain("Technology");
+    })
+    test("should filter based on department(All) selected", () => {
+        const [departmentComboBox, statusComboBox] = screen.getAllByRole("combobox");
+        fireEvent.change(departmentComboBox, {target: {value: 'All'}});
+        const [_, tbody] = screen.getAllByRole("rowgroup");
+        const datRows = within(tbody).getAllByRole("row");
+        const [name, email, dateOfHire, department, status] = within(datRows[0]).getAllByRole("cell");
+        expect(datRows.length).toBe(2);
+    })
+    test("should filter based on status(ACTIVE) selected", () => {
+        const [departmentComboBox, statusComboBox] = screen.getAllByRole("combobox");
+        fireEvent.change(departmentComboBox, {target: {value: 'All'}});
+        fireEvent.change(statusComboBox, {target: {value: 'ACTIVE'}});
+        const [_, tbody]= screen.getAllByRole("rowgroup");
+        const dataRows = within(tbody).getAllByRole("row");
+        const [name, email, dateOfHire, department, status] = within(dataRows[0]).getAllByRole("cell");
+        expect(dataRows.length).toBe(1);
+        expect(status.textContent).toBe('ACTIVE');
+    })
+    test("should filter based on status(ALL) selected", () => {
+        const [departmentComboBox, statusComboBox] = screen.getAllByRole("combobox");
+        fireEvent.change(departmentComboBox, {target: {value: 'All'}});
+        fireEvent.change(statusComboBox, {target: {value: 'All'}});
+        const [_, tbody]= screen.getAllByRole("rowgroup");
+        const dataRows = within(tbody).getAllByRole("row");
+        expect(dataRows.length).toBe(2);
+    })
+    test("should filter based on department(Technology) + status(ACTIVE) selected", () => {
+        const [departmentComboBox, statusComboBox] = screen.getAllByRole("combobox");
+        fireEvent.change(departmentComboBox, {target: {value: 'Technology'}});
+        fireEvent.change(statusComboBox, {target: {value: 'ACTIVE'}});
+        const [_, tbody]= screen.getAllByRole("rowgroup");
+        const dataRows = within(tbody).getAllByRole("row");
+        expect(dataRows.length).toBe(1);
     })
 })
