@@ -14,10 +14,20 @@ export class EmployeeService {
   constructor(private httpClient: HttpClient) { }
 
   fetchEmployees(): Observable<Employee[]> {
-    return this.httpClient.get<Employee[]>(this.url).pipe(catchError(err => of([])))
+    return this.httpClient
+    .get<Employee[]>(this.url)
+    .pipe(catchError(err => of([])))
   }
 
   fetchEmployeeDetails(empId: string): Observable<Employee | null> {
-    return this.httpClient.get<Employee>(this.url + '/' +empId).pipe(catchError(err => of(null)))
+    return this.httpClient
+    .get<Employee>(this.url + '/' +empId)
+    .pipe(catchError(err => of(null)))
+  }
+
+  searchEmployees(searchText: string): Observable<Employee[]> {
+    return this.httpClient
+    .get<Employee[]>(`${this.url}/search?searchText=${searchText}`)
+    .pipe(catchError(err => of([])))
   }
 }

@@ -39,3 +39,6 @@ h3 {
     gap: 2em;
     justify-content: center;
 }
+.filters > div{
+    align-self: flex-end;
+}

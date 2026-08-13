@@ -2,12 +2,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EmployeeComponent } from './employee.component';
-import { By, Title } from '@angular/platform-browser';
-import { DatePipe } from '@angular/common';
+import { By } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DepartmentService } from '../service/department.service';
+
 
 export const employeeMockData = [{id: '1', 
   firstName: 'Tanvee', 

@@ -2,7 +2,15 @@
 
 <h3>Employee List</h3>
 
+
+
 <div class="filters">
+    <div class="search">
+        <input class="form-control" 
+                [formControl]="searchControl" 
+                placeholder="Search" 
+                (input)="search()"/>
+    </div>
     <div>
         <label for="department">Department</label>
          <select id="department" class="form-control" [formControl]="departmentSelected">
@@ -46,7 +54,7 @@
        </tr>
     </thead>
     <tbody>
-        @for (emp of employees() | departmentPipe: departmentSelected.value | statusPipe: statusSelected.value | sortPipe: sortBy.value ?? undefined; track emp.id) {
+        @for (emp of displayList() | departmentPipe: departmentSelected.value | statusPipe: statusSelected.value | sortPipe: sortBy.value ?? undefined; track emp.id) {
             <tr>
                 <td>{{emp.firstName}} {{emp.lastName}}</td>
                 <td>{{emp.role.title}}</td>
