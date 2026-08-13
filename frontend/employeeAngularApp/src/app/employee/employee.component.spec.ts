@@ -1,20 +1,23 @@
 /// <reference types="jasmine" />
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { EmployeeComponent } from './employee.component';
 import { By } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { EmployeeService } from '../service/employee.service';
+import { of } from 'rxjs';
+import { Employee } from './employee.model';
 
 
-export const employeeMockData = [{id: '1', 
+export const employeeMockData: Employee[] = [{id: '1', 
   firstName: 'Tanvee', 
   lastName: 'Anjankar', 
   dateOfHire: '2022-01-03', 
   departmentName: 'Technology', 
   email: 'drama@gmail.com', 
-  status: 'ACTIVE', 
+  status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE' , 
   role: {
     title: 'Software Engineer',
     level: 'ABC'
@@ -30,7 +33,7 @@ export const employeeMockData = [{id: '1',
   dateOfHire: '2021-05-10',
   departmentName: 'Finance',
   email: 'john@gmail.com',
-  status: 'INACTIVE',
+  status: 'INACTIVE' as 'ACTIVE' | 'INACTIVE' ,
   role: {
     title: 'Accountant',
     level: 'B2'
@@ -136,4 +139,59 @@ describe('EmployeeComponent', () => {
     expect(rows.length).toBe(1);
     expect(rows[0].nativeElement.textContent).toContain('Tanvee Anjankar');
   })
+
+  it('should search employees and update the list with the result', fakeAsync(() => {
+    // the search API returns only the matching employee — a DISTINCT subset,
+    // so we can prove the list actually changed to the search result
+    const searchResult = [employeeMockData[0]];
+
+    // stub the backend search; `of(...)` emits the subset synchronously
+    const employeeService = fixture.debugElement.injector.get(EmployeeService);
+    const searchSpy = spyOn(employeeService, 'searchEmployees').and.returnValue(of(searchResult));
+
+    // baseline: both employees are visible before any search
+    let rows = fixture.debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(employeeMockData.length);
+
+    // type "Tanvee" — the (input) event drives both the formControl and search()
+    const input: HTMLInputElement = fixture.debugElement.query(By.css('input')).nativeElement;
+    input.value = 'Tanvee';
+    input.dispatchEvent(new Event('input'));
+
+    // the control reflects the typed value immediately (no debounce on the control)
+    expect(component.searchControl.value).toBe('Tanvee');
+
+    // flush the 300ms debounceTime so switchMap actually calls the service,
+    // then re-render so the table reflects the new displayList
+    tick(300);
+    fixture.detectChanges();
+
+    // the API was hit exactly once, with the typed term
+    expect(searchSpy).toHaveBeenCalledOnceWith('Tanvee');
+
+    // the signal is replaced with the search result
+    expect(component.displayList()).toEqual(searchResult);
+
+    // and the user-visible table now shows only the matching row
+    rows = fixture.debugElement.queryAll(By.css('tbody tr'));
+    expect(rows.length).toBe(1);
+    expect(rows[0].nativeElement.textContent).toContain('Tanvee Anjankar');
+  }))
+
+  it('should debounce the search by 300ms before hitting the API', fakeAsync(() => {
+    const employeeService = fixture.debugElement.injector.get(EmployeeService);
+    const searchSpy = spyOn(employeeService, 'searchEmployees').and.returnValue(of([]));
+
+    const input: HTMLInputElement = fixture.debugElement.query(By.css('input')).nativeElement;
+    input.value = 'Tan';
+    input.dispatchEvent(new Event('input'));
+
+    // just before the debounce window closes — the API must NOT be called yet
+    tick(299);
+    expect(searchSpy).not.toHaveBeenCalled();
+
+    // crossing the 300ms threshold — now the call fires (once)
+    tick(1);
+    expect(searchSpy).toHaveBeenCalledOnceWith('Tan');
+  }))
 });
