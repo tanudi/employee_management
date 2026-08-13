@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fullstack.employee.dto.EmployeeDTO;
@@ -32,6 +33,11 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public EmployeeDTO getEmployee(@PathVariable UUID id) throws NotFoundException {
         return employeeService.getEmployee(id);
+    }
+
+    @GetMapping("/search")
+    public List<EmployeeDTO> searchEmployees(@RequestParam String searchText) {
+        return employeeService.searchEmployees(searchText);
     }
 
 }

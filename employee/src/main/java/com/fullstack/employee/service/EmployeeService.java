@@ -37,6 +37,11 @@ public class EmployeeService {
         return employee.map(EmployeeService::toDTO).orElseThrow(NotFoundException::new);
     }
 
+    public List<EmployeeDTO> searchEmployees(String searchText) {
+        List<Employee> employees = employeeRepo.searchEmployeesByText(searchText);
+        return employees.stream().map(EmployeeService::toDTO).toList();
+    }
+
     private static EmployeeDTO toDTO(Employee employee) {
         Department department = employee.getDepartment();
         AddressDTO addressDTO = EmployeeService.toAddressDTO(employee.getAddress());
