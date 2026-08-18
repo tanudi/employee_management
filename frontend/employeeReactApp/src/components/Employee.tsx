@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLoaderData } from "react-router-dom"
 import { fetchDepartments } from "../services/DepartmentService";
+import useDebounce from "../hooks/useDebounce";
+import { searchEmployees } from "../services/EmployeeService";
 
 export interface EmployeeModel {
     id: string,
@@ -30,30 +32,40 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", options);
 
 
 export default function Employee() {
-    const employees: EmployeeModel[] = useLoaderData();
+    let employees: EmployeeModel[] = useLoaderData();
+    const [employeeList, setEmployeeList] = useState(employees);
     const [departments, setDepartments] = useState<Department[]>([])
     const [departmentSelected, setDepartmentSelected] = useState('All');
     const [statusSelected, setStatusSelected] = useState<'All' | 'ACTIVE' | 'INACTIVE'>('All');
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const debouncedTerm = useDebounce(searchTerm, 300);
 
     const filteredEmployees = useMemo(() => {
         if (departmentSelected === 'All') {
-            return employees;
+            return employeeList;
         }
-        return employees.filter(emp => emp.departmentName === departmentSelected);
-    }, [employees, departmentSelected]);
+        return employeeList.filter(emp => emp.departmentName === departmentSelected);
+    }, [employeeList, departmentSelected]);
 
     const filteredEmployeesByStatus = useMemo(() => {
         if(statusSelected === 'All') {
             return filteredEmployees;
         }
         return filteredEmployees.filter(emp => emp.status === statusSelected)
-    }, [employees, statusSelected, departmentSelected])
+    }, [employeeList, statusSelected, departmentSelected])
 
     useEffect(() => {
         fetchDepartments().then(response => {
             setDepartments(response);
         })
     }, [])
+
+    useEffect(() => {
+        // search api
+        searchEmployees(debouncedTerm).then(response => {
+                setEmployeeList(response);
+            })
+    }, [debouncedTerm])
 
     function filterEmployeeListBasedOnDepartment(departmentName: string) {
         setDepartmentSelected(departmentName);
@@ -62,6 +74,9 @@ export default function Employee() {
     return <div className="p-5 flex flex-col">
     <h1 className="text-2xl my-4">Employee List</h1>
     <div className="flex flex-row self-center">
+        <div>
+            <input className="border m-1 p-1" type="text" placeholder="Search" onChange={(event) => setSearchTerm(event.target.value)}/>
+        </div>
         <div>
             <label htmlFor="department">Departments:</label>
         <select id="department" className="border m-2" onChange={(event) => filterEmployeeListBasedOnDepartment(event.target.value)}>
