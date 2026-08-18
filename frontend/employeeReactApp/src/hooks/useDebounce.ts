@@ -5,7 +5,6 @@ export default function useDebounce(searchText: string, delay: number) {
 
     useEffect(() => {
         let timer = setTimeout(() => {
-            console.log('inside ook')
             setDebounceText(searchText)
         }, delay)
 

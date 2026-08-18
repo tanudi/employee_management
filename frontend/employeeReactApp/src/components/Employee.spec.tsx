@@ -1,7 +1,8 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import Employee from "./Employee";
+import { searchEmployees } from "../services/EmployeeService";
 
 const employeeMockData = [{id: '1', 
   firstName: 'Tanvee', 
@@ -48,10 +49,20 @@ vi.mock("../services/DepartmentService", () => ({
   fetchDepartments: vi.fn(() => Promise.resolve(departmentMockData)),
 }));
 
+vi.mock("../services/EmployeeService", () => ({
+  searchEmployees: vi.fn((searchText: string) =>
+    Promise.resolve(
+      employeeMockData.filter(emp =>
+        `${emp.firstName} ${emp.lastName}`.toLowerCase().includes(searchText.toLowerCase())
+      )
+    )
+  ),
+}));
+
 describe('Employee Component', () => {
     let router : ReturnType<typeof createMemoryRouter>;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         router = createMemoryRouter([
             {
                 path: "/",
@@ -61,6 +72,7 @@ describe('Employee Component', () => {
         ]);
 
         render(<RouterProvider router={router} />);
+        await screen.findByText("Employee List");
     })
     test("should render h1 tag", async () => {
         expect(await screen.findByText("Employee List")).toBeInTheDocument();
@@ -137,5 +149,22 @@ describe('Employee Component', () => {
         const [_, tbody]= screen.getAllByRole("rowgroup");
         const dataRows = within(tbody).getAllByRole("row");
         expect(dataRows.length).toBe(1);
+    })
+    test("should search employee through search input", async () => {
+        const [inputBox] = screen.getAllByRole("textbox");
+        fireEvent.change(inputBox, {target: {value: 'Tanvee'}});
+
+        await waitFor(() => {
+            expect(searchEmployees).toHaveBeenCalledWith('Tanvee');
+        });
+
+        const [_, tbody] = screen.getAllByRole("rowgroup");
+        const dataRows = await waitFor(() => {
+            const rows = within(tbody).getAllByRole("row");
+            expect(rows.length).toBe(1);
+            return rows;
+        });
+        const [name] = within(dataRows[0]).getAllByRole("cell");
+        expect(name.textContent).toContain("Tanvee Anjankar");
     })
 })

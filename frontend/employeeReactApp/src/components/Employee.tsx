@@ -62,9 +62,15 @@ export default function Employee() {
 
     useEffect(() => {
         // search api
+        if (!debouncedTerm) {
+            setEmployeeList(employees);
+            return;
+        }
         searchEmployees(debouncedTerm).then(response => {
+            if (response) {
                 setEmployeeList(response);
-            })
+            }
+        })
     }, [debouncedTerm])
 
     function filterEmployeeListBasedOnDepartment(departmentName: string) {
