@@ -1,6 +1,7 @@
 package com.fullstack.employee.entity;
 
 import java.sql.Date;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
@@ -50,5 +52,26 @@ public class Employee {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Role role;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Employee reportsTo;
+
+    @OneToMany(mappedBy = "reportsTo")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Employee> manages;
+
+    @OneToMany(mappedBy = "employee")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Attendance> attendances;
+
+    @OneToOne(mappedBy = "employee")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private UserAccount authenticates;
 
 }
